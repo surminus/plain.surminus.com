@@ -21,7 +21,7 @@ func init() {
 	flag.Parse()
 }
 
-const BuildDirectory = "build"
+const BuildDirectory = "docs"
 const ContentDirectory = "content"
 
 func main() {
