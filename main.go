@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/fs"
 	"log"
@@ -10,6 +11,15 @@ import (
 	"path/filepath"
 	"strings"
 )
+
+var serve bool
+var port int
+
+func init() {
+	flag.BoolVar(&serve, "serve", false, "Serve the site")
+	flag.IntVar(&port, "port", 80, "Port to serve on")
+	flag.Parse()
+}
 
 const BuildDirectory = "build"
 const ContentDirectory = "content"
@@ -59,6 +69,14 @@ func main() {
 	}); err != nil {
 		log.Fatal(err)
 	}
+
+	if serve {
+		log.Println("Serving at:", fmt.Sprintf("http://localhost:%d", port))
+		cmd := exec.Command(docker(), []string{"run", "--rm", "--name", "surminus.com", "--volume", "./build/:/usr/share/nginx/html:ro", "--publish", fmt.Sprintf("%d:80", port), "nginx"}...)
+		if err := cmd.Run(); err != nil {
+			log.Fatal(err)
+		}
+	}
 }
 
 type Pandoc struct {
@@ -77,11 +95,6 @@ func (p *Pandoc) Write() error {
 }
 
 func (p *Pandoc) DockerCmd(args ...string) *exec.Cmd {
-	bin, err := exec.LookPath("docker")
-	if err != nil {
-		log.Fatal("docker missing")
-	}
-
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -113,9 +126,18 @@ func (p *Pandoc) DockerCmd(args ...string) *exec.Cmd {
 
 	cmdargs := append(coreargs, []string{"-s", "-o", p.Destination}...)
 
-	cmd := exec.Command(bin, append(cmdargs, args...)...)
+	cmd := exec.Command(docker(), append(cmdargs, args...)...)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 
 	return cmd
+}
+
+func docker() string {
+	bin, err := exec.LookPath("docker")
+	if err != nil {
+		log.Fatal("docker missing")
+	}
+
+	return bin
 }
