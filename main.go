@@ -21,7 +21,7 @@ func init() {
 	flag.Parse()
 }
 
-const BuildDirectory = "docs"
+const BuildDirectory = "build"
 const ContentDirectory = "content"
 
 func main() {
@@ -72,7 +72,7 @@ func main() {
 
 	if serve {
 		log.Println("Serving at:", fmt.Sprintf("http://localhost:%d", port))
-		cmd := exec.Command(docker(), []string{"run", "--rm", "--name", "surminus.com", "--volume", "./build/:/usr/share/nginx/html:ro", "--publish", fmt.Sprintf("%d:80", port), "nginx"}...)
+		cmd := exec.Command(docker(), []string{"run", "--rm", "--name", "surminus.com", "--volume", fmt.Sprintf("./%s/:/usr/share/nginx/html:ro", BuildDirectory), "--publish", fmt.Sprintf("%d:80", port), "nginx"}...)
 		if err := cmd.Run(); err != nil {
 			log.Fatal(err)
 		}
