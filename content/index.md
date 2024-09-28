@@ -5,6 +5,7 @@ title: Laura Martin
 * [About Me](about.html)
 * [CV](cv.html)
 * [GPG](gpg.html)
+* [Daily Civ Quote](/civ-quotes)
 
 ## Links
 
