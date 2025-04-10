@@ -1,5 +1,5 @@
 ---
-title: Life Philosophy
+title: Philosophy
 ---
 
 Thoughts on life that probably only make sense to me:
